@@ -1,0 +1,31 @@
+{
+  "name": "gatito-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodemon main",
+    "createTable": "node src/database/criarTabelas.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dvargas42/gatito-api.git"
+  },
+  "author": "Daniel Vargas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dvargas42/gatito-api/issues"
+  },
+  "homepage": "https://github.com/dvargas42/gatito-api#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "config": "^3.3.6",
+    "express": "^4.17.1",
+    "mysql2": "^2.3.0",
+    "sequelize": "^6.6.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
