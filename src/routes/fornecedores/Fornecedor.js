@@ -1,4 +1,6 @@
+const CustomError = require("../../errors/CustomError");
 const TabelaFornecedor = require("./TabelaFornecedor");
+
 class Fornecedor {
   constructor({
     id,
@@ -56,7 +58,7 @@ class Fornecedor {
     });
 
     if (Object.keys(dadosParaAtualizar).length === 0) {
-      throw new Error("Não foram fornecidos dados para atualizar!");
+      throw new CustomError("Não foram fornecidos dados para atualizar!", 400);
     }
 
     await TabelaFornecedor.atualizar(this.id, dadosParaAtualizar);
@@ -71,7 +73,7 @@ class Fornecedor {
       const valor = this[campo];
 
       if (typeof valor !== "string" || valor.length === 0) {
-        throw new Error(`O campo ${campo} está inválido]`);
+        throw new CustomError(`O campo '${campo}' está inválido!`, 400);
       }
     });
   }
