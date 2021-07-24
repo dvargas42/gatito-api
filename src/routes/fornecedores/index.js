@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const TabelaFornecedor = require("./TabelaFornecedor");
 const Fornecedor = require("./Fornecedor");
+const CustomError = require("../../errors/CustomError");
 
 const route = Router();
 
@@ -10,7 +11,7 @@ route.get("/", async (request, response) => {
   response.send(JSON.stringify(resultados));
 });
 
-route.post("/", async (request, response) => {
+route.post("/", async (request, response, next) => {
   try {
     const dadosRecebidos = request.body;
     const fornecedor = new Fornecedor(dadosRecebidos);
@@ -19,13 +20,12 @@ route.post("/", async (request, response) => {
 
     response.status(201);
     response.send(JSON.stringify(fornecedor));
-  } catch (erro) {
-    response.status(400);
-    response.send(JSON.stringify({ mensagem: erro.message }));
+  } catch (error) {
+    next(error);
   }
 });
 
-route.get("/:id", async (request, response) => {
+route.get("/:id", async (request, response, next) => {
   try {
     const { id } = request.params;
     const fornecedor = new Fornecedor({ id });
@@ -33,12 +33,12 @@ route.get("/:id", async (request, response) => {
     await fornecedor.carregar();
 
     response.send(JSON.stringify(fornecedor));
-  } catch (erro) {
-    response.status(404).send(JSON.stringify({ mensagem: erro.message }));
+  } catch (error) {
+    next(error);
   }
 });
 
-route.put("/:id", async (request, response) => {
+route.put("/:id", async (request, response, next) => {
   try {
     const { id } = request.params;
     const { body } = request;
@@ -49,12 +49,12 @@ route.put("/:id", async (request, response) => {
 
     response.status(204);
     response.end();
-  } catch (erro) {
-    response.status(400).send(JSON.stringify({ mensagem: erro.message }));
+  } catch (error) {
+    next(error);
   }
 });
 
-route.delete("/:id", async (request, response) => {
+route.delete("/:id", async (request, response, next) => {
   try {
     const { id } = request.params;
     const fornecedor = new Fornecedor({ id: id });
@@ -64,8 +64,8 @@ route.delete("/:id", async (request, response) => {
 
     response.status(204);
     response.end();
-  } catch (erro) {
-    response.status(404).send(JSON.stringify({ mensagem: erro.message }));
+  } catch (error) {
+    next(error);
   }
 });
 
