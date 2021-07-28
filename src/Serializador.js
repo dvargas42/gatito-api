@@ -7,7 +7,7 @@ class Serializador {
 
   serializar(dados) {
     if (this.contentType === "application/json") {
-      return this.json(dados);
+      return this.filtrar(dados);
     }
 
     throw new CustomError(
@@ -15,6 +15,39 @@ class Serializador {
       406
     );
   }
+
+  filtrarObjeto(dados) {
+    const novoObjeto = {};
+
+    this.camposPublicos.forEach((campo) => {
+      if (dados.hasOwnProperty(campo)) {
+        novoObjeto[campo] = dados[campo];
+      }
+    });
+
+    return novoObjeto;
+  }
+
+  filtrar(dados) {
+    if (Array.isArray(dados)) {
+      dados = dados.map((dado) => this.filtrarObjeto(dado));
+    } else {
+      dados = this.filtrarObjeto(dados);
+    }
+    return dados;
+  }
 }
 
-module.exports = Serializador;
+class SerializadorFornecedor extends Serializador {
+  constructor(contentType) {
+    super();
+    this.contentType = contentType;
+    this.camposPublicos = ["id", "empresa", "categoria"];
+  }
+}
+
+module.exports = {
+  Serializador,
+  SerializadorFornecedor,
+  formatosAceitos: ["application/json"],
+};
