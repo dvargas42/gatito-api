@@ -2,13 +2,18 @@ const { Router } = require("express");
 const TabelaFornecedor = require("./TabelaFornecedor");
 const Fornecedor = require("./Fornecedor");
 const CustomError = require("../../errors/CustomError");
-
+const { SerializadorFornecedor } = require("../../Serializador");
 const route = Router();
 
 route.get("/", async (request, response) => {
   const resultados = await TabelaFornecedor.listar();
 
-  response.send(JSON.stringify(resultados));
+  const serializador = new SerializadorFornecedor(
+    response.getHeader("Content-Type")
+  );
+
+  response.status(200);
+  response.send(serializador.serializar(resultados));
 });
 
 route.post("/", async (request, response, next) => {
@@ -18,8 +23,12 @@ route.post("/", async (request, response, next) => {
 
     await fornecedor.criar();
 
+    const serializador = new SerializadorFornecedor(
+      response.getHeader("Content-Type")
+    );
+
     response.status(201);
-    response.send(JSON.stringify(fornecedor));
+    response.send(serializador.serializar(fornecedor));
   } catch (error) {
     next(error);
   }
@@ -31,8 +40,11 @@ route.get("/:id", async (request, response, next) => {
     const fornecedor = new Fornecedor({ id });
 
     await fornecedor.carregar();
-
-    response.send(JSON.stringify(fornecedor));
+    const serializador = new SerializadorFornecedor(
+      response.getHeader("Content-Type")
+    );
+    response.status(200);
+    response.send(serializador.serializar(fornecedor));
   } catch (error) {
     next(error);
   }
