@@ -40,9 +40,12 @@ route.get("/:id", async (request, response, next) => {
     const fornecedor = new Fornecedor({ id });
 
     await fornecedor.carregar();
+
     const serializador = new SerializadorFornecedor(
-      response.getHeader("Content-Type")
+      response.getHeader("Content-Type"),
+      ["email", "dataCriacao", "dataAtualizacao", "versao"]
     );
+
     response.status(200);
     response.send(serializador.serializar(fornecedor));
   } catch (error) {
