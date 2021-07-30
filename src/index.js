@@ -3,7 +3,7 @@ const config = require("config");
 
 const CustomError = require("./errors/CustomError");
 const routeFornecedores = require("./routes/fornecedores");
-const { formatosAceitos } = require("./Serializador");
+const { formatosAceitos, SerializadorErro } = require("./Serializador");
 
 const app = express();
 
@@ -28,16 +28,20 @@ app.use((request, response, next) => {
 app.use("/api/fornecedores", routeFornecedores);
 
 app.use((error, request, response, next) => {
+  let id = 1;
   let status = 500;
   let message = "Internal server error!";
 
   if (error instanceof CustomError) {
     status = error.statusCode;
     message = error.message;
+    id = error.id;
   }
 
+  const serializador = new SerializadorErro(response.getHeader("Content-Type"));
+
   response.status(status);
-  response.send(JSON.stringify({ message, status }));
+  response.send(serializador.serializar({ message, status, id }));
 });
 
 app.listen(config.get("api.port"), () =>
