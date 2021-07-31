@@ -1,3 +1,4 @@
+const jsontoxml = require("jsontoxml");
 const CustomError = require("./errors/CustomError");
 
 class Serializador {
@@ -5,9 +6,29 @@ class Serializador {
     return JSON.stringify(dados);
   }
 
+  xml(dados) {
+    let tag = this.tagSingle;
+
+    if (Array.isArray(dados)) {
+      tag = this.tagPlural;
+
+      dados = dados.map((item) => {
+        return { [this.tagSingle]: { item } };
+      });
+    }
+
+    return jsontoxml({ [tag]: dados });
+  }
+
   serializar(dados) {
+    dados = this.filtrar(dados);
+
     if (this.contentType === "application/json") {
-      return this.filtrar(dados);
+      return this.json(dados);
+    }
+
+    if (this.contentType === "application/xml") {
+      return this.xml(dados);
     }
 
     throw new CustomError(
@@ -43,6 +64,8 @@ class SerializadorFornecedor extends Serializador {
     super();
     this.contentType = contentType;
     this.camposPublicos = ["id", "empresa", "categoria"].concat(camposExtras);
+    this.tagSingle = "fornecedor";
+    this.tagPlural = "fornecedores";
   }
 }
 
@@ -51,6 +74,8 @@ class SerializadorErro extends Serializador {
     super();
     this.contentType = contentType;
     this.camposPublicos = ["id", "message"].concat(camposExtras || []);
+    this.tagSingle = "erro";
+    this.tagPlural = "erros";
   }
 }
 
@@ -58,5 +83,5 @@ module.exports = {
   Serializador,
   SerializadorFornecedor,
   SerializadorErro,
-  formatosAceitos: ["application/json"],
+  formatosAceitos: ["application/json", "application/xml"],
 };
